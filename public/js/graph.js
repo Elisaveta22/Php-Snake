@@ -5,12 +5,12 @@ function Graph(c = {}) {
         SIZE = c.size, // размеры
         sprites = c.sprites; // Координаты в спрайте
 
+    ctx.fillStyle = "#577ddb";
 
     // Отрисовываем карту
     this.draw = (data = {}) => {
         c.game.block.attr({width: (SIZE.width * SIZE.sizeSnake) + 'px', height: (SIZE.height * SIZE.sizeSnake) + 'px'});
 
-        ctx.fillStyle = "#577ddb";
         this.clear();
 
         this.drawMap();
@@ -31,7 +31,7 @@ function Graph(c = {}) {
 
     this.drawSnakes = (snakes = {}) => {
         // Отрисовываем всех змей
-        for(let i = 0; i < snakes.length; i++) {
+        for (let i = 0; i < snakes.length; i++) {
             this.drawSnake(snakes[i]);
         }
     };
@@ -43,16 +43,18 @@ function Graph(c = {}) {
             lastPosition = {}, // Последняя позиция
             countItems = 0; // Количество тел в змейке
 
-        if(!body) return;
+        if (!body) return;
         countItems = body.length;
 
+        let bodyPart = null;
+
         // Loop over every snake segment
-        for (var i=0; i<snake.body.length; i++) {
+        for (var i = 0; i < snake.body.length; i++) {
             var segment = snake.body[i];
             var segx = segment.x;
             var segy = segment.y;
-            var tilex = segx*SIZE.sizeSnake;
-            var tiley = segy*SIZE.sizeSnake;
+            var tilex = segx * SIZE.sizeSnake;
+            var tiley = segy * SIZE.sizeSnake;
 
             // Sprite column and row that gets calculated
             var tx = 0;
@@ -60,101 +62,78 @@ function Graph(c = {}) {
 
             if (i == 0) {
                 // Head; Determine the correct image
-                var nseg = snake.body[i+1]; // Next segment
+                var nseg = snake.body[i + 1]; // Next segment
                 if (segy < nseg.y) {
                     // Up
-                    tx = 3; ty = 0;
+                    bodyPart = "head_up";
                 } else if (segx > nseg.x) {
                     // Right
-                    tx = 4; ty = 0;
+                    bodyPart = "head_right";
                 } else if (segy > nseg.y) {
                     // Down
-                    tx = 4; ty = 1;
+                    bodyPart = "head_down";
                 } else if (segx < nseg.x) {
                     // Left
-                    tx = 3; ty = 1;
-                }
-            } else if (i == snake.body.length-1) {
-                // Tail; Determine the correct image
-                var pseg = snake.body[i-1]; // Prev segment
-                if (pseg.y < segy) {
-                    // Up
-                    tx = 3; ty = 2;
-                } else if (pseg.x > segx) {
-                    // Right
-                    tx = 4; ty = 2;
-                } else if (pseg.y > segy) {
-                    // Down
-                    tx = 4; ty = 3;
-                } else if (pseg.x < segx) {
-                    // Left
-                    tx = 3; ty = 3;
+                    bodyPart = "head_left";
                 }
             } else {
-                // Body; Determine the correct image
-                var pseg = snake.body[i-1]; // Previous segment
-                var nseg = snake.body[i+1]; // Next segment
-                if (pseg.x < segx && nseg.x > segx || nseg.x < segx && pseg.x > segx) {
-                    // Horizontal Left-Right
-                    tx = 1; ty = 0;
-                } else if (pseg.x < segx && nseg.y > segy || nseg.x < segx && pseg.y > segy) {
-                    // Angle Left-Down
-                    tx = 2; ty = 0;
-                } else if (pseg.y < segy && nseg.y > segy || nseg.y < segy && pseg.y > segy) {
-                    // Vertical Up-Down
-                    tx = 2; ty = 1;
-                } else if (pseg.y < segy && nseg.x < segx || nseg.y < segy && pseg.x < segx) {
-                    // Angle Top-Left
-                    tx = 2; ty = 2;
-                } else if (pseg.x > segx && nseg.y < segy || nseg.x > segx && pseg.y < segy) {
-                    // Angle Right-Up
-                    tx = 0; ty = 1;
-                } else if (pseg.y > segy && nseg.x > segx || nseg.y > segy && pseg.x > segx) {
-                    // Angle Down-Right
-                    tx = 0; ty = 0;
-                }
+
+                bodyPart = "body";
             }
 
-            // Draw the image of the snake part
-            /*ctx.drawImage(tileimage, tx*64, ty*64, 64, 64, tilex, tiley,
-                32, 32);*/
-            let options = {
-                xsprite: tx*64,
-                ysprite: ty*64,
-                x: tilex,
-                y: tiley,
-            };
-            this.drawSprite(options);
+            this.drawSprite(bodyPart, tilex, tiley);
         }
     };
 
     // Рисование еды
     this.drawFoods = (foods = {}) => {
         // Отрисовываем всех змей
-        for(let i = 0; i < foods.length; i++) {
+        for (let i = 0; i < foods.length; i++) {
             this.drawFood(foods[i]);
         }
     };
 
     this.drawFood = (food = {}) => {
-        let options = {
-            xsprite: sprites.eat[0],
-            ysprite: sprites.eat[1],
-            x: food.x*SIZE.sizeSnake,
-            y: food.y*SIZE.sizeSnake,
-        };
-        this.drawSprite(options);
+        this.drawSprite("food", food.x * SIZE.sizeSnake, food.y * SIZE.sizeSnake);
     };
 
 
-
     // Рисование спрайта
-    this.drawSprite = (options = {}) => {
-        if(options) {
+    this.drawSprite = (bodyPartName, x, y) => {
+
+        let imageName = null;
+
+        if (bodyPartName === "head_up") {
+
+            imageName = "Head_Up.png";
+
+        } else if (bodyPartName === "head_down") {
+
+            imageName = "Head_Down.png";
+
+        } else if (bodyPartName === "head_right") {
+
+            imageName = "Head_Right.png";
+
+        } else if (bodyPartName === "head_left") {
+
+            imageName = "Head_Left.png";
+
+        } else if (bodyPartName === "body") {
+
+            imageName = "Body.png";
+
+        } else if (bodyPartName === "food") {
+
+            imageName = "Food.png";
+
+        }
+
+        if (imageName != null) {
             let sprite = new Image();
-            sprite.src = c.path.sprites + 'sprites.png';
-            sprite.addEventListener("load", function(){
-                ctx.drawImage(sprite, options.xsprite, options.ysprite, 64 ,64, options.x, options.y, SIZE.sizeSnake, SIZE.sizeSnake);
+            sprite.src = c.path.images + imageName;
+            sprite.addEventListener("load", function () {
+                ctx.drawImage(sprite, 0, 0, 64, 64, x, y, SIZE.sizeSnake, SIZE.sizeSnake);
             }, false);
 
         }

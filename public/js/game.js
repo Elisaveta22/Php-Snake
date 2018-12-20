@@ -1,6 +1,10 @@
 // Игра
 function Game(server, switchPage) {
     var c, ui, graph;
+    let isChangingDirection = false; // is the user currently waiting for change direction signal?
+    let isUpdatingScene = false;
+    let directionToMove = null;
+    let refresh_rate = 60; // every 1/2 of second update scene
 
     this.init = () => {
         ui = new UI(handlerUI);
@@ -11,29 +15,63 @@ function Game(server, switchPage) {
         graph.init();
         graph.draw(options);
         ui.init();
-        this.updateScene();
+        this.gameLoop();
     };
 
     // Отлавливаем колбеки UI
     const handlerUI = {
         onChangeDirection: async (direction = 'right') => {
-            const answer = await server.changeDirection(direction);
-            if(answer.result) {
-                // Отрисовываем игру
-            } else {
-                error(answer.error);
+
+            if (isUpdatingScene === false) {
+
+                directionToMove = direction;
             }
         },
     };
 
+    this.gameLoop = async () => {
+
+        while (true) {
+
+            // handle direction moves
+            if (directionToMove != null) {
+
+                const answer = await server.changeDirection(directionToMove);
+                if (answer.result) {
+                    // Отрисовываем игру
+                } else {
+                    error(answer.error);
+                }
+
+                directionToMove = null;
+            }
+
+            // update scene
+            const game_finished = await this.updateScene();
+
+            // end game loop if game is finished
+            if (game_finished) break;
+
+            // wait for refresh_rate miliseconds
+            await sleep(refresh_rate)
+
+        }
+    };
+
+    function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     // обновление сцены
     this.updateScene = async () => {
-        const answer = await server.getScene();
+
         let isFinish = false; // игра закончена
 
-        if(answer.result) {
+        const answer = await server.getScene();
+
+        if (answer.result) {
             // положительный результат сервера
-            if(answer.data.finish) {
+            if (answer.data.finish) {
                 isFinish = true;
                 c.text.user_score.text(answer.data.score);
                 c.modal.finish.modal(); // выдаем окно с завершением игры
@@ -48,9 +86,8 @@ function Game(server, switchPage) {
         } else {
             error(answer.error);
         }
-        if(!isFinish) {
-            setTimeout(() => this.updateScene(), 200);
-        }
+
+        return isFinish;
     };
 
 

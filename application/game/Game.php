@@ -1,8 +1,8 @@
 <?php
 
-require_once 'struct\Struct.php';
-require_once 'logic\Logic.php';
-require_once 'input\Input.php';
+require_once 'struct/Struct.php';
+require_once 'logic/Logic.php';
+require_once 'input/Input.php';
 
 class Game {
 

@@ -52,7 +52,7 @@ function User(server, switchPage) {
             c.blocks.maps.append('<div class="map_item" data-map-id="'+map.id+'">Карта номер '+map.id+'</div>');
         });
         c.blocks.maps.find('[data-map-id]').bind("click", (e) => {
-            event.preventDefault();
+            e.preventDefault();
             let map_id = $(e.target).data('map-id');
             this.onGetMap(map_id);
         })
