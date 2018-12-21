@@ -68,6 +68,17 @@ function User(server, switchPage, changeNavBar) {
         }
     };
 
+    this.onLogout = async (options = {}) => {
+
+        const answer = await server.logout(options);
+        if (answer.result) {
+            changeNavBar(false);
+            switchPage('LoginPage');
+        } else {
+            error(answer.error);
+        }
+    };
+
     this.onGetLeaderBoard = async (options = {}) => {
 
         const answer = await server.getLeaderBoard(options);

@@ -26,7 +26,7 @@ function Server() {
 		return $.get('api', { method: 'register', ...options });
 	};
 	this.logout = function () {
-		return $.get('api', { method: 'logout'});
+		return $.get('api', { method: 'logout', token});
 	};
     this.getScene = function() {
         return $.get('api', { method: 'getScene', map_id, token });
