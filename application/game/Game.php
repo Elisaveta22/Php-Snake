@@ -85,6 +85,10 @@ class Game {
         return (object) $this->input->getCommand();
     }
 
+    public function getLeaderBoard() {
+        return (object) $this->db->getLeaderboard();
+    }
+
     public function executeCommand($name, $options = null) {
         $COMMAND = (object) $this->input->getCommand();
         switch ($name) {
@@ -92,6 +96,7 @@ class Game {
             case $COMMAND->GET_SCENE : return $this->getData($options->map_id);
             case $COMMAND->START_GAME: return $this->startGame($options->map_id, $options->user_id);
             case $COMMAND->FINISH_GAME: return $this->finishGame($options->map_id, $options->user_id);
+            case $COMMAND->GET_LEADER_BOARD: return $this->getLeaderBoard();
         }
         $this->getData($options->map_id);
         return $this->input->executeCommand($name, $options);

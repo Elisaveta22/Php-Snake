@@ -17,17 +17,14 @@
 
 <body>
 
-<nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
+<nav class="navbar navbar-fixed-top navbar-dark bg-inverse" id="nav_bar">
 	<a class="navbar-brand" href="#">Snake of PI</a>
 	<ul class="nav navbar-nav">
-		<li class="nav-item active">
-			<a class="nav-link" href="#">Главная <span class="sr-only">(current)</span></a>
+		<li id="profile_page_nav" class="nav-item active">
+			<a class="nav-link"  style="cursor: pointer;" onClick="switchPage('ProfilePage')">Главная <span class="sr-only">(current)</span></a>
 		</li>
-		<li class="nav-item">
-			<a class="nav-link" href="#">Игра</a>
-		</li>
-		<li class="nav-item">
-			<a class="nav-link" href="#">Турнирная таблица</a>
+		<li id="leader_board_page_nav" class="nav-item">
+			<a class="nav-link" style="cursor: pointer;" onClick="switchPage('LeaderBoardPage')">Турнирная таблица</a>
 		</li>
 	</ul>
 </nav>
@@ -88,7 +85,7 @@
 						<td>Score</td>
 					</tr>
 					</thead>
-					<tbody>
+					<tbody id="leaderboard_type">
 					<tr>
 						<td>Петя</td>
 						<td>0.0</td>

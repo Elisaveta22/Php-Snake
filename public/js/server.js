@@ -31,6 +31,9 @@ function Server() {
     this.getScene = function() {
         return $.get('api', { method: 'getScene', map_id, token });
     };
+    this.getLeaderBoard = function() {
+        return $.get('api', { method: 'getLeaderBoard', token });
+    };
 
     // Токены
 	this.getToken = () => {

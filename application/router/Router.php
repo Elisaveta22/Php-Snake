@@ -39,6 +39,10 @@ class Router {
             $this->bad('logout fail');
     }
 
+    private function getLeaderBoard(){
+	    return $this->db->getLeaderboard();
+    }
+
     // общий ответ на ВСЕ входящие запросы
 	public function answer($options) {
 	    if ($options && isset($options->method)) {

@@ -1,4 +1,4 @@
-function User(server, switchPage) {
+function User(server, switchPage, changeNavBar) {
 
     var c;
 
@@ -6,24 +6,23 @@ function User(server, switchPage) {
     this.init = () => {
         switchPage('LoginPage');
         // Вызов хендлеров
-    	this.handleLogin(this.onLogin);
+        this.handleLogin(this.onLogin);
         this.handleRegister(this.onRegister);
-    	this.handleClickLoginBtn(() => {
+        this.handleClickLoginBtn(() => {
             switchPage('RegisterPage');
-		});
-    	this.handleClickRegisterBtn(() => {
+        });
+        this.handleClickRegisterBtn(() => {
             switchPage('LoginPage');
-		});
-    	this.handleClickLogoutBtn(this.onLogout);
+        });
+        this.handleClickLogoutBtn(this.onLogout);
         this.handleClickStartGameBtn(this.onStartGame);
 
-
-	};
+    };
 
     // Нажатие на начать игру
     this.onStartGame = async () => {
         const answer = await server.getMaps();
-        if(answer.result) {
+        if (answer.result) {
             switchPage('MapsPage');
             // Отрисовываем выборку карт
             this.createMaps(answer.data);
@@ -36,7 +35,7 @@ function User(server, switchPage) {
     this.onGetMap = async (map_id = 0) => {
         server.setMapId(map_id);
         const answer = await server.startGame(map_id);
-        if(answer.result) {
+        if (answer.result) {
             // Переключаемся в игру
             switchPage('GamePage', answer.data);
         } else {
@@ -45,11 +44,11 @@ function User(server, switchPage) {
     };
     // Отрисовываем карты
     this.createMaps = (maps) => {
-        if(maps.length > 0) {
+        if (maps.length > 0) {
             c.blocks.maps.html('');
         }
         $.each(maps, (i, map) => {
-            c.blocks.maps.append('<div class="map_item" data-map-id="'+map.id+'">Карта номер '+map.id+'</div>');
+            c.blocks.maps.append('<div class="map_item" data-map-id="' + map.id + '">Карта номер ' + map.id + '</div>');
         });
         c.blocks.maps.find('[data-map-id]').bind("click", (e) => {
             e.preventDefault();
@@ -61,8 +60,28 @@ function User(server, switchPage) {
     // Авторизация на сервере
     this.onLogin = async (options = {}) => {
         const answer = await server.login(options);
-        if(answer.result) {
+        if (answer.result) {
+            changeNavBar(true);
             switchPage('ProfilePage');
+        } else {
+            error(answer.error);
+        }
+    };
+
+    this.onGetLeaderBoard = async (options = {}) => {
+
+        const answer = await server.getLeaderBoard(options);
+        if (answer.result) {
+
+            $("#leaderboard_type").empty();
+
+            for (var key in answer.data) {
+
+                if (answer.data.hasOwnProperty(key)) {
+                    $("#leaderboard_type").append('<tr><td>' + answer.data[key].login + '</td><td>' + answer.data[key].score + '</td></tr>');
+                }
+            }
+
         } else {
             error(answer.error);
         }
@@ -71,13 +90,12 @@ function User(server, switchPage) {
     // Регистрация на сервере
     this.onRegister = async (options = {}) => {
         const answer = await server.register(options);
-        if(answer.result) {
+        if (answer.result) {
             switchPage('ProfilePage');
         } else {
             error(answer.error);
         }
     };
-
 
 
     /* Обработка нажатий */

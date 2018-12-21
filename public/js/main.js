@@ -9,19 +9,31 @@ $(document).ready(async () => {
     var c, server, user, game;
 
     function init() {
-         c = new Const(); // Элементы страницы
-         server = new Server(); // Сервер
-         user = new User(server, switchPage); // Пользователь
-         game = new Game(server, switchPage); // Игра
+        c = new Const(); // Элементы страницы
+        server = new Server(); // Сервер
+        user = new User(server, switchPage, changeNavBar); // Пользователь
+        game = new Game(server, switchPage); // Игра
 
 
+        changeNavBar(false);
         user.init();
     }
 
 
+    changeNavBar = (enableIt) => {
+
+        if (enableIt === true) {
+
+            c.navBar.removeClass('hidden');
+        } else {
+
+            c.navBar.addClass('hidden');
+        }
+    };
+
     // Переключатель страниц
-    switchPage = (page = '', options = {}) => {
-        switch(page) {
+    switchPage = async (page = '', options = {}) => {
+        switch (page) {
             case 'LoginPage':
                 c.game.wrapper.find('.page').addClass('hidden');
                 c.pages.login.removeClass('hidden');
@@ -35,17 +47,26 @@ $(document).ready(async () => {
             case 'ProfilePage':
                 c.game.wrapper.find('.page').addClass('hidden');
                 c.pages.profile.removeClass('hidden');
+                c.profile_page_nav.addClass('active');
+                c.leader_board_page_nav.removeClass('active');
+
+                break;
+            case 'LeaderBoardPage':
+                c.game.wrapper.find('.page').addClass('hidden');
+                c.pages.scorePage.removeClass('hidden');
+                c.profile_page_nav.removeClass('active');
+                c.leader_board_page_nav.addClass('active');
+                await user.onGetLeaderBoard();
 
                 break;
             case 'MapsPage':
                 c.game.wrapper.find('.page').addClass('hidden');
                 c.pages.maps.removeClass('hidden');
-
                 break;
             case 'GamePage':
                 c.game.wrapper.find('.page').addClass('hidden');
                 c.pages.game.removeClass('hidden');
-                if(options) {
+                if (options) {
                     game.init();
                     game.start(options);
                 }
@@ -56,22 +77,25 @@ $(document).ready(async () => {
 
     init();
 
-	error = (err = "") => {
-		console.log("Ошибка :: %s", err)
-	}
-
+    error = (err = "") => {
+        console.log("Ошибка :: %s", err)
+    }
 
 });
 
 // Элементы страницы
 function Const() {
     return {
+        navBar: $('#nav_bar'),
+        profile_page_nav: $('#profile_page_nav'),
+        leader_board_page_nav: $('#leader_board_page_nav'),
         pages: {
             login: $('.loginPage'),
             register: $('.registerPage'),
             game: $('.gamePage'),
             profile: $('.profilePage'),
             maps: $('.mapsPage'),
+            scorePage: $('.scorePage')
         },
         modal: {
             finish: $('#modalFinishGame'),

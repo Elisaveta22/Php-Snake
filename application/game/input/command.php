@@ -7,4 +7,5 @@ const COMMAND = [
     'GET_MAPS' => 'getMaps', // получить список карт
     'START_GAME' => 'startGame', // начать игру
     'FINISH_GAME' => 'finishGame', // закончить игру
+    'GET_LEADER_BOARD' => 'getLeaderBoard', // закончить игру
 ];
