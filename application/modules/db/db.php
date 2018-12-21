@@ -12,11 +12,26 @@ class DB {
     public $map;*/
 
     public function __construct() {
-        $host = 'localhost';
+        $host = 'localhost:3306';
         $dbName = 'snake_of_pi';
-        $user = 'mysql';
-        $pass = 'mysql';
+        $user = 'root';
+        $pass = '';
         $this->conn = new PDO('mysql:dbname=' . $dbName . ';host=' . $host, $user, $pass);
+    }
+
+    public function getUserById($id) {
+        $sql = 'SELECT name, login, score FROM user WHERE id = :id';
+        $stm = $this->conn->prepare($sql);
+        $stm->bindValue(':id', $id, PDO::PARAM_INT);
+        $stm->execute();
+        return $stm->fetchObject('stdClass');
+    }
+
+    public function getAllUsers() {
+        $sql = 'SELECT name, login, score FROM user';
+        $stm = $this->conn->prepare($sql);
+        $stm->execute();
+        return $stm->fetchAll(PDO::FETCH_CLASS);
     }
 
     //Создать пользователя
